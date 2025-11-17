@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+
   const labels: any = {
     Age: "Usia (tahun)",
     Daily_Usage_Hours: "Waktu layar per hari (jam)",
@@ -24,7 +27,6 @@ export default function Home() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
 
   function handleChange(e: any) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,17 +34,24 @@ export default function Home() {
 
   async function handleSubmit() {
     setLoading(true);
-    setResult(null);
 
     try {
-      const res = await fetch("https://web-production-57cb3.up.railway.app/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const res = await fetch(
+        "https://web-production-57cb3.up.railway.app/predict",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        }
+      );
 
       const data = await res.json();
-      setResult(data);
+
+      // Simpan hasil prediksi di localStorage
+      localStorage.setItem("predictionData", JSON.stringify(data));
+
+      // Redirect ke halaman result
+      router.push("/result");
     } catch (err) {
       console.error(err);
       alert("Gagal melakukan prediksi");
@@ -58,7 +67,6 @@ export default function Home() {
           📱 Prediksi Kecanduan HP
         </h1>
 
-        {/* INPUT FORM */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {Object.keys(formData).map((key) => (
             <div key={key}>
@@ -78,7 +86,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* BUTTON */}
         <button
           onClick={handleSubmit}
           disabled={loading}
@@ -86,32 +93,6 @@ export default function Home() {
         >
           {loading ? "Memprediksi..." : "Prediksi Sekarang"}
         </button>
-
-        {/* RESULT */}
-        {result && (
-          <div className="mt-6 p-4 border border-green-700 bg-green-900/30 rounded-xl">
-            <h2 className="font-bold text-lg">Hasil Prediksi:</h2>
-
-            <p className="mt-2">
-              Kategori:{" "}
-              <strong className="text-green-400">
-                {result.prediction}
-              </strong>
-            </p>
-
-            <div className="mt-3">
-              <h3 className="font-medium mb-1">Probabilitas:</h3>
-              <ul className="list-disc ml-6 space-y-1">
-  {Object.entries(result?.probabilities || {}).map(([label, p]) => (
-    <li key={label}>
-      {label}: {(Number(p) * 100).toFixed(2)}%
-    </li>
-  ))}
-</ul>
-
-            </div>
-          </div>
-        )}
       </div>
     </main>
   );

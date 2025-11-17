@@ -1,13 +1,19 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ResultPage() {
-  const sp = useSearchParams();
-  const pred = sp.get("pred");
+  const [data, setData] = useState<any>(null);
 
-  const labels = ["Rendah", "Sedang", "Tinggi"];
-  const probs = labels.map((l) => ({ label: l, value: Number(sp.get(l) || 0) }));
+  useEffect(() => {
+    const stored = localStorage.getItem("predictionData");
+    if (stored) {
+      setData(JSON.parse(stored));
+    }
+  }, []);
+
+  const pred = data?.prediction || "-";
+  const probs = data?.probabilities || {};
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6 bg-black text-white">
@@ -15,18 +21,15 @@ export default function ResultPage() {
         <h1 className="text-3xl font-bold mb-6 text-center">📊 Hasil Prediksi</h1>
 
         <p className="mb-2 text-lg">
-          Kategori:{" "}
-          <strong className="text-blue-400">
-            {pred || "-"}
-          </strong>
+          Kategori: <strong className="text-blue-400">{pred}</strong>
         </p>
 
         <div className="mt-4">
           <h3 className="font-medium text-neutral-300">Probabilitas</h3>
           <ul className="list-disc ml-6 mt-3 space-y-1">
-            {probs.map((p) => (
-              <li key={p.label}>
-                {p.label}: {(p.value * 100).toFixed(2)}%
+            {Object.entries(probs).map(([label, p]) => (
+              <li key={label}>
+                {label}: {(Number(p) * 100).toFixed(2)}%
               </li>
             ))}
           </ul>
