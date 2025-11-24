@@ -27,32 +27,32 @@ interface FormData {
   Exercise_Hours: number;
 }
 
-// --- Components ---
+// --- Components (Versi Light Mode) ---
 
 const InputCard = ({ 
   label, icon: Icon, value, onChange, max = 24, step = 1, color = "blue", warning = false 
 }: any) => (
   <motion.div 
-    whileHover={{ scale: 1.02 }}
-    className={`relative group backdrop-blur-md border rounded-3xl p-6 transition-all hover:shadow-2xl 
+    whileHover={{ y: -4 }}
+    className={`relative group border rounded-3xl p-6 transition-all duration-300
       ${warning 
-        ? "bg-red-500/10 border-red-500/50 shadow-red-500/20" 
-        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-purple-500/10"
+        ? "bg-red-50 border-red-200 shadow-lg shadow-red-100" 
+        : "bg-white border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:border-purple-100"
       }`}
   >
     <div className="flex flex-col mb-6">
       <div className="flex items-center gap-4 mb-3">
-        <div className={`p-3 rounded-xl bg-gradient-to-br from-${color}-500/20 to-transparent shadow-inner border border-white/5`}>
-          {/* Ikon diperbesar sedikit */}
-          <Icon className={`w-6 h-6 text-${color}-400`} />
+        {/* Icon Container: Warna lembut (Pastel) */}
+        <div className={`p-3 rounded-xl ${warning ? "bg-red-100" : `bg-${color}-50`} border border-${color}-100`}>
+          <Icon className={`w-6 h-6 ${warning ? "text-red-600" : `text-${color}-600`}`} />
         </div>
-        {/* FONT LABEL: Diperbesar dan dibuat Elegant dengan tracking-wide */}
-        <span className="text-white/90 font-semibold tracking-wide text-lg">{label}</span>
+        {/* Label: Abu tua agar kontras */}
+        <span className="text-slate-600 font-semibold tracking-wide text-lg">{label}</span>
       </div>
       
-      {/* FONT ANGKA: Diperbesar jadi text-4xl */}
-      <span className={`text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r self-end tracking-tight
-        ${warning ? "from-red-400 to-red-200" : "from-white to-gray-400"}`}>
+      {/* Angka: Hitam Pekat agar sangat jelas terbaca */}
+      <span className={`text-4xl font-extrabold self-end tracking-tight
+        ${warning ? "text-red-600" : "text-slate-800"}`}>
         {value}
       </span>
     </div>
@@ -64,21 +64,21 @@ const InputCard = ({
       step={step}
       value={value}
       onChange={(e) => onChange(Number(e.target.value))}
-      className={`w-full h-3 rounded-lg appearance-none cursor-pointer transition-all
-        ${warning ? "bg-red-900/50 accent-red-500" : "bg-gray-700/50 accent-purple-500 hover:accent-purple-400"}`}
+      className={`w-full h-3 rounded-full appearance-none cursor-pointer transition-all
+        ${warning ? "bg-red-100 accent-red-500" : "bg-slate-100 accent-purple-600 hover:accent-purple-500"}`}
     />
   </motion.div>
 );
 
 export default function PhoneAddictionPredictor() {
   const labels: Record<FormDataKey, string> = {
-    Age: "Usia (tahun)",
-    Daily_Usage_Hours: "Waktu layar per hari (jam)",
-    Phone_Checks_Per_Day: "Berapa kali membuka HP",
-    Time_on_Social_Media: "Waktu bermedia sosial (jam)",
-    Time_on_Gaming: "Waktu bermain game (jam)",
-    Sleep_Hours: "Durasi tidur (jam)",
-    Exercise_Hours: "Durasi aktivitas fisik (jam)",
+    Age: "Usia Kamu",
+    Daily_Usage_Hours: "Screen Time Harian",
+    Phone_Checks_Per_Day: "Frekuensi Cek HP",
+    Time_on_Social_Media: "Scrolling Sosmed",
+    Time_on_Gaming: "Sesi Gaming",
+    Sleep_Hours: "Waktu Tidur",
+    Exercise_Hours: "Olahraga & Fisik",
   };
 
   const [formData, setFormData] = useState<FormData>({
@@ -157,36 +157,43 @@ export default function PhoneAddictionPredictor() {
   }
 
   const getResultColor = (level: string) => {
-    if (level === "Rendah") return "from-green-400 to-emerald-600";
-    if (level === "Sedang") return "from-yellow-400 to-orange-600";
-    return "from-red-500 to-rose-700";
+    if (level === "Rendah") return "text-emerald-600 bg-emerald-50 border-emerald-200";
+    if (level === "Sedang") return "text-amber-600 bg-amber-50 border-amber-200";
+    return "text-rose-600 bg-rose-50 border-rose-200";
   };
 
+  const getGradientText = (level: string) => {
+    if (level === "Rendah") return "from-emerald-600 to-teal-500";
+    if (level === "Sedang") return "from-amber-500 to-orange-600";
+    return "from-rose-500 to-red-600";
+  }
+
   return (
-    <div className="min-h-screen bg-[#050505] text-white selection:bg-purple-500/30 font-sans overflow-x-hidden relative">
+    // Background: Slate-50 (Putih keabuan lembut, bukan putih menyilaukan)
+    <div className="min-h-screen bg-slate-50 text-slate-900 font-sans overflow-x-hidden relative selection:bg-purple-200 selection:text-purple-900">
       
-      {/* Background Ambience - Sedikit lebih gelap agar font putih lebih pop-out */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+      {/* Background Ambience - Pastel Blobs */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-200/40 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-200/40 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
         
-        {/* Header - Font Title Dibuat Lebih Elegan & Besar */}
+        {/* Header Clean & Modern */}
         <motion.div 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16 space-y-6"
         >
-          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-purple-200 tracking-wider mb-2">
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white border border-slate-200 text-sm font-bold text-purple-600 shadow-sm tracking-wider mb-2">
             <Activity className="w-4 h-4" />
             <span>AI POWERED ANALYSIS</span>
           </div>
-          <h1 className="text-6xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-white via-purple-100 to-gray-500">
-            Prediksi Kecanduan HP
+          <h1 className="text-5xl md:text-7xl font-black tracking-tight text-slate-900">
+            Prediksi <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">Kecanduan HP</span>
           </h1>
-          <p className="text-gray-400 text-xl font-bold tracking-wide max-w-6xl mx-auto">
+          <p className="text-slate-500 text-xl font-medium max-w-2xl mx-auto leading-relaxed">
             Analisis kebiasaan digital Anda dengan teknologi Artificial Intelligence.
           </p>
         </motion.div>
@@ -215,7 +222,7 @@ export default function PhoneAddictionPredictor() {
                   value={formData.Phone_Checks_Per_Day} 
                   onChange={(v: number) => updateField("Phone_Checks_Per_Day", v)} 
                   max={200} 
-                  color="yellow"
+                  color="yellow" // Di Light mode akan jadi Amber/Orange agar terbaca
                 />
                 
                 <InputCard 
@@ -267,7 +274,7 @@ export default function PhoneAddictionPredictor() {
                       initial={{ opacity: 0, y: 20, scale: 0.9 }}
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 20, scale: 0.9 }}
-                      className="mb-4 bg-red-600/90 backdrop-blur-md border border-red-400 text-white font-semibold px-6 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-2xl shadow-red-900/50"
+                      className="mb-4 bg-red-50 border border-red-200 text-red-700 font-semibold px-6 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-lg shadow-red-100"
                     >
                       <AlertTriangle className="w-6 h-6 shrink-0" />
                       <span className="text-lg">{warning}</span>
@@ -278,9 +285,12 @@ export default function PhoneAddictionPredictor() {
                 <button
                   onClick={handleSubmit}
                   disabled={loading || !!warning}
-                  className="w-full relative group overflow-hidden rounded-2xl bg-white p-5 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-2xl shadow-purple-900/20"
+                  className="w-full relative group overflow-hidden rounded-2xl bg-slate-900 p-5 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-slate-300"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] transition-all group-hover:opacity-90" />
+                  <div className="absolute inset-0 bg-slate-900 transition-all group-hover:bg-slate-800" />
+                  {/* Subtle Gradient Shine on Hover */}
+                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-100%] group-hover:animate-shine" />
+                  
                   <div className="relative flex items-center justify-center gap-3 text-xl font-bold text-white tracking-wide">
                     {loading ? (
                       <>
@@ -289,7 +299,7 @@ export default function PhoneAddictionPredictor() {
                       </>
                     ) : (
                       <>
-                        <Zap className="w-6 h-6 fill-current" />
+                        <Zap className="w-6 h-6 fill-current text-yellow-400" />
                         ANALISIS SEKARANG
                       </>
                     )}
@@ -304,47 +314,47 @@ export default function PhoneAddictionPredictor() {
               animate={{ opacity: 1, scale: 1 }}
               className="max-w-2xl mx-auto"
             >
-              <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-10 md:p-14 text-center shadow-2xl relative overflow-hidden">
-                <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${getResultColor(result.prediction)}`} />
+              {/* Result Card: White with Soft Shadow */}
+              <div className="bg-white border border-slate-100 rounded-[2.5rem] p-10 md:p-14 text-center shadow-[0_20px_50px_rgb(0,0,0,0.08)] relative overflow-hidden">
                 
-                <h3 className="text-gray-400 text-sm uppercase tracking-[0.2em] font-bold mb-8">Hasil Analisis</h3>
+                <h3 className="text-slate-400 text-sm uppercase tracking-[0.2em] font-bold mb-8">Hasil Analisis</h3>
                 
                 <div className="relative inline-block mb-10">
-                  <div className={`absolute inset-0 bg-gradient-to-r ${getResultColor(result.prediction)} blur-3xl opacity-30 animate-pulse`} />
-                  <h2 className={`relative text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r ${getResultColor(result.prediction)} tracking-tight`}>
+                  <h2 className={`relative text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-br ${getGradientText(result.prediction)} tracking-tight`}>
                     {result.prediction}
                   </h2>
                 </div>
 
                 {result.probability && (
                   <div className="flex flex-col items-center gap-3 mb-10">
-                    <div className="h-2 w-full max-w-xs bg-gray-800 rounded-full overflow-hidden">
+                    <div className="h-3 w-full max-w-xs bg-slate-100 rounded-full overflow-hidden border border-slate-200">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${result.probability * 100}%` }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className={`h-full bg-gradient-to-r ${getResultColor(result.prediction)}`} 
+                        className={`h-full bg-gradient-to-r ${getGradientText(result.prediction)}`} 
                       />
                     </div>
-                    <span className="text-gray-400 font-mono tracking-widest text-sm">PROBABILITAS: {(result.probability * 100).toFixed(1)}%</span>
+                    <span className="text-slate-500 font-mono tracking-widest text-sm font-bold">PROBABILITAS: {(result.probability * 100).toFixed(1)}%</span>
                   </div>
                 )}
 
-                <div className="bg-white/5 rounded-3xl p-8 text-left border border-white/5 shadow-inner">
-                  <h4 className="flex items-center gap-3 text-xl font-bold text-white mb-4">
-                    {result.prediction === "Rendah" ? <CheckCircle2 className="w-6 h-6 text-green-500"/> : 
-                     result.prediction === "Sedang" ? <AlertTriangle className="w-6 h-6 text-yellow-500"/> : 
-                     <XCircle className="w-6 h-6 text-red-500"/>}
+                {/* Advice Box */}
+                <div className={`rounded-3xl p-8 text-left border ${getResultColor(result.prediction)} bg-opacity-30`}>
+                  <h4 className="flex items-center gap-3 text-xl font-bold mb-4">
+                    {result.prediction === "Rendah" ? <CheckCircle2 className="w-6 h-6"/> : 
+                     result.prediction === "Sedang" ? <AlertTriangle className="w-6 h-6"/> : 
+                     <XCircle className="w-6 h-6"/>}
                     Saran AI:
                   </h4>
-                  <p className="text-gray-300 text-lg leading-relaxed font-light">
+                  <p className="text-slate-700 text-lg leading-relaxed font-medium">
                     {getAdvice(result.prediction)}
                   </p>
                 </div>
 
                 <button
                   onClick={() => setResult(null)}
-                  className="mt-10 text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2 w-full py-4 hover:bg-white/5 rounded-2xl font-medium tracking-wide"
+                  className="mt-10 text-slate-400 hover:text-slate-900 transition-colors flex items-center justify-center gap-2 w-full py-4 hover:bg-slate-50 rounded-2xl font-bold tracking-wide"
                 >
                   ← KEMBALI KE FORM
                 </button>
