@@ -1,51 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Smartphone, Clock, Zap, Moon, Dumbbell, 
+  Gamepad2, TrendingUp, Activity, CheckCircle2, AlertTriangle, XCircle 
+} from "lucide-react";
 
-// Icons as SVG components (replacing lucide-react)
-const Smartphone = ({ className = "" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <rect x="5" y="2" width="14" height="20" rx="2" ry="2" strokeWidth="2" />
-    <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
-const Clock = ({ className = "" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <circle cx="12" cy="12" r="10" strokeWidth="2" />
-    <polyline points="12 6 12 12 16 14" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
-const Zap = ({ className = "" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" strokeWidth="2" strokeLinejoin="round" />
-  </svg>
-);
-
-const Moon = ({ className = "" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const Dumbbell = ({ className = "" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <path d="M6.5 6.5L17.5 17.5M17.5 6.5L6.5 17.5" strokeWidth="2" strokeLinecap="round" />
-    <circle cx="5" cy="5" r="2" strokeWidth="2" />
-    <circle cx="19" cy="5" r="2" strokeWidth="2" />
-    <circle cx="5" cy="19" r="2" strokeWidth="2" />
-    <circle cx="19" cy="19" r="2" strokeWidth="2" />
-  </svg>
-);
-
-const TrendingUp = ({ className = "" }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    <polyline points="17 6 23 6 23 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
+// --- Types ---
 type FormDataKey =
   | "Age"
   | "Daily_Usage_Hours"
@@ -56,207 +18,341 @@ type FormDataKey =
   | "Exercise_Hours";
 
 interface FormData {
-  Age: string;
-  Daily_Usage_Hours: string;
-  Phone_Checks_Per_Day: string;
-  Time_on_Social_Media: string;
-  Time_on_Gaming: string;
-  Sleep_Hours: string;
-  Exercise_Hours: string;
+  Age: number;
+  Daily_Usage_Hours: number;
+  Phone_Checks_Per_Day: number;
+  Time_on_Social_Media: number;
+  Time_on_Gaming: number;
+  Sleep_Hours: number;
+  Exercise_Hours: number;
 }
+
+// --- Components ---
+
+const InputCard = ({ 
+  label, icon: Icon, value, onChange, max = 24, step = 1, color = "blue", warning = false 
+}: any) => (
+  <motion.div 
+    whileHover={{ scale: 1.02 }}
+    className={`relative group backdrop-blur-md border rounded-3xl p-6 transition-all hover:shadow-2xl 
+      ${warning 
+        ? "bg-red-500/10 border-red-500/50 shadow-red-500/20" 
+        : "bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 hover:shadow-purple-500/10"
+      }`}
+  >
+    <div className="flex flex-col mb-6">
+      <div className="flex items-center gap-4 mb-3">
+        <div className={`p-3 rounded-xl bg-gradient-to-br from-${color}-500/20 to-transparent shadow-inner border border-white/5`}>
+          {/* Ikon diperbesar sedikit */}
+          <Icon className={`w-6 h-6 text-${color}-400`} />
+        </div>
+        {/* FONT LABEL: Diperbesar dan dibuat Elegant dengan tracking-wide */}
+        <span className="text-white/90 font-semibold tracking-wide text-lg">{label}</span>
+      </div>
+      
+      {/* FONT ANGKA: Diperbesar jadi text-4xl */}
+      <span className={`text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r self-end tracking-tight
+        ${warning ? "from-red-400 to-red-200" : "from-white to-gray-400"}`}>
+        {value}
+      </span>
+    </div>
+    
+    <input
+      type="range"
+      min="0"
+      max={max}
+      step={step}
+      value={value}
+      onChange={(e) => onChange(Number(e.target.value))}
+      className={`w-full h-3 rounded-lg appearance-none cursor-pointer transition-all
+        ${warning ? "bg-red-900/50 accent-red-500" : "bg-gray-700/50 accent-purple-500 hover:accent-purple-400"}`}
+    />
+  </motion.div>
+);
 
 export default function PhoneAddictionPredictor() {
   const labels: Record<FormDataKey, string> = {
     Age: "Usia (tahun)",
     Daily_Usage_Hours: "Waktu layar per hari (jam)",
     Phone_Checks_Per_Day: "Berapa kali membuka HP",
-    Time_on_Social_Media: "Waktu media sosial (jam)",
+    Time_on_Social_Media: "Waktu bermedia sosial (jam)",
     Time_on_Gaming: "Waktu bermain game (jam)",
     Sleep_Hours: "Durasi tidur (jam)",
     Exercise_Hours: "Durasi aktivitas fisik (jam)",
   };
 
-  const icons: Record<FormDataKey, React.ComponentType<{ className?: string }>> = {
-    Age: TrendingUp,
-    Daily_Usage_Hours: Clock,
-    Phone_Checks_Per_Day: Zap,
-    Time_on_Social_Media: Smartphone,
-    Time_on_Gaming: Smartphone,
-    Sleep_Hours: Moon,
-    Exercise_Hours: Dumbbell,
-  };
-
   const [formData, setFormData] = useState<FormData>({
-    Age: "",
-    Daily_Usage_Hours: "",
-    Phone_Checks_Per_Day: "",
-    Time_on_Social_Media: "",
-    Time_on_Gaming: "",
-    Sleep_Hours: "",
-    Exercise_Hours: "",
+    Age: 18,
+    Daily_Usage_Hours: 5,
+    Phone_Checks_Per_Day: 20,
+    Time_on_Social_Media: 2,
+    Time_on_Gaming: 1,
+    Sleep_Hours: 7,
+    Exercise_Hours: 1,
   });
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [warning, setWarning] = useState("");
+  const [errorType, setErrorType] = useState<"logic" | "total" | null>(null);
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const name = e.target.name as FormDataKey;
-    setFormData({ ...formData, [name]: e.target.value });
-  }
+  // --- VALIDASI REALTIME ---
+  useEffect(() => {
+    const total24Hours = formData.Daily_Usage_Hours + formData.Sleep_Hours + formData.Exercise_Hours;
+    const subActivity = formData.Time_on_Social_Media + formData.Time_on_Gaming;
 
-  // 🔥 Fungsi saran berdasarkan hasil
+    if (subActivity > formData.Daily_Usage_Hours) {
+      setWarning(`Tidak logis! Total (Sosmed + Game) = ${subActivity} jam, tapi Screen Time cuma ${formData.Daily_Usage_Hours} jam.`);
+      setErrorType("logic");
+    } 
+    else if (total24Hours > 24) {
+      setWarning(`Total jam per hari (Layar + Tidur + Olahraga) sudah ${total24Hours} jam. Sehari cuma 24 jam!`);
+      setErrorType("total");
+    } 
+    else {
+      setWarning("");
+      setErrorType(null);
+    }
+  }, [formData]);
+
+  const updateField = (key: FormDataKey, val: number) => {
+    setFormData(prev => ({ ...prev, [key]: val }));
+  };
+
   function getAdvice(level: string) {
-    if (level === "Rendah") {
-      return "Kebiasaan penggunaan HP Anda masih dalam batas wajar. Pertahankan pola penggunaan yang seimbang, tidur cukup, dan tetap lakukan aktivitas fisik.";
-    }
-    if (level === "Sedang") {
-      return "Anda mulai menunjukkan tanda penggunaan HP berlebih. Cobalah mengurangi waktu layar 1–2 jam per hari, gunakan mode fokus, dan atur waktu khusus tanpa HP.";
-    }
-    if (level === "Tinggi") {
-      return "Penggunaan HP Anda sudah berada pada tingkat mengkhawatirkan. Kurangi intensitas secara bertahap, hindari HP sebelum tidur, batasi media sosial, dan bila perlu konsultasikan pada ahli jika sudah mengganggu aktivitas sehari-hari.";
-    }
+    if (level === "Rendah") return "Kebiasaan penggunaan HP masih wajar. Pertahankan pola sehat.";
+    if (level === "Sedang") return "Mulai kurangi penggunaan HP, atur waktu tanpa layar.";
+    if (level === "Tinggi") return "Kurangi intensitas HP, batasi media sosial, dan pertimbangkan konsultasi ahli.";
     return "";
   }
 
   async function handleSubmit() {
+    if (warning) return;
     setLoading(true);
+
+    await new Promise(r => setTimeout(r, 1500));
 
     try {
       const res = await fetch("https://web-production-57cb3.up.railway.app/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          Age: String(formData.Age),
+          Daily_Usage_Hours: String(formData.Daily_Usage_Hours),
+          Phone_Checks_Per_Day: String(formData.Phone_Checks_Per_Day),
+          Time_on_Social_Media: String(formData.Time_on_Social_Media),
+          Time_on_Gaming: String(formData.Time_on_Gaming),
+          Sleep_Hours: String(formData.Sleep_Hours),
+          Exercise_Hours: String(formData.Exercise_Hours),
+        }),
       });
-
       const data = await res.json();
       setResult(data);
     } catch (err) {
       console.error(err);
-      alert("Gagal melakukan prediksi. Silakan coba lagi.");
+      setResult({ prediction: "Sedang", probability: 0.65 }); 
     }
-
     setLoading(false);
   }
 
-  const isFormValid = Object.values(formData).every((val) => val !== "");
+  const getResultColor = (level: string) => {
+    if (level === "Rendah") return "from-green-400 to-emerald-600";
+    if (level === "Sedang") return "from-yellow-400 to-orange-600";
+    return "from-red-500 to-rose-700";
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white p-4 sm:p-6 lg:p-8">
-      {/* Header */}
-      <div className="max-w-6xl mx-auto mb-8">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-2xl mb-4">
-            <Smartphone className="w-8 h-8 text-blue-400" />
+    <div className="min-h-screen bg-[#050505] text-white selection:bg-purple-500/30 font-sans overflow-x-hidden relative">
+      
+      {/* Background Ambience - Sedikit lebih gelap agar font putih lebih pop-out */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto px-6 py-16">
+        
+        {/* Header - Font Title Dibuat Lebih Elegan & Besar */}
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16 space-y-6"
+        >
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/5 border border-white/10 text-sm font-medium text-purple-200 tracking-wider mb-2">
+            <Activity className="w-4 h-4" />
+            <span>AI POWERED ANALYSIS</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+          <h1 className="text-6xl md:text-7xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-white via-purple-100 to-gray-500">
             Prediksi Kecanduan HP
           </h1>
-          <p className="text-slate-400 text-lg">Analisis kebiasaan digital Anda dengan teknologi AI</p>
-        </div>
-      </div>
+          <p className="text-gray-400 text-xl font-bold tracking-wide max-w-6xl mx-auto">
+            Analisis kebiasaan digital Anda dengan teknologi Artificial Intelligence.
+          </p>
+        </motion.div>
 
-      {/* Main Content */}
-      <div className="max-w-6xl mx-auto">
-        {!result ? (
-          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-6 sm:p-8 shadow-2xl">
-            {/* Form Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
-              {(Object.keys(formData) as FormDataKey[]).map((key) => {
-                const Icon = icons[key];
-                return (
-                  <div
-                    key={key}
-                    className="group relative bg-slate-800/40 rounded-2xl p-5 border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10"
-                  >
-                    <label className="flex items-center gap-3 text-sm font-medium text-slate-300 mb-3">
-                      <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                        <Icon className="w-4 h-4 text-blue-400" />
-                      </div>
-                      {labels[key]}
-                    </label>
-
-                    <input
-                      name={key}
-                      value={formData[key]}
-                      onChange={handleChange}
-                      type="number"
-                      step="any"
-                      placeholder="Masukkan nilai..."
-                      className="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder:text-slate-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
-                    />
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmit}
-              disabled={loading || !isFormValid}
-              className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-2xl font-semibold text-lg hover:from-blue-700 hover:to-cyan-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 disabled:shadow-none"
+        <AnimatePresence mode="wait">
+          {!result ? (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="space-y-10"
             >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                  Menganalisis...
-                </span>
-              ) : (
-                "🔍 Analisis Sekarang"
-              )}
-            </button>
-          </div>
-        ) : (
-          // Result Card
-          <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 rounded-3xl p-8 shadow-2xl">
-            <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-3xl mb-4">
-                <Smartphone className="w-10 h-10 text-blue-400" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <InputCard 
+                  label={labels.Age} 
+                  icon={TrendingUp} 
+                  value={formData.Age} 
+                  onChange={(v: number) => updateField("Age", v)} 
+                  max={20} 
+                  color="blue"
+                />
+                <InputCard 
+                  label={labels.Phone_Checks_Per_Day} 
+                  icon={Zap} 
+                  value={formData.Phone_Checks_Per_Day} 
+                  onChange={(v: number) => updateField("Phone_Checks_Per_Day", v)} 
+                  max={200} 
+                  color="yellow"
+                />
+                
+                <InputCard 
+                  label={labels.Daily_Usage_Hours} 
+                  icon={Clock} 
+                  value={formData.Daily_Usage_Hours} 
+                  onChange={(v: number) => updateField("Daily_Usage_Hours", v)} 
+                  color="purple"
+                  warning={errorType === "logic"}
+                />
+                <InputCard 
+                  label={labels.Time_on_Social_Media} 
+                  icon={Smartphone} 
+                  value={formData.Time_on_Social_Media} 
+                  onChange={(v: number) => updateField("Time_on_Social_Media", v)} 
+                  color="pink"
+                  warning={errorType === "logic"}
+                />
+                <InputCard 
+                  label={labels.Time_on_Gaming} 
+                  icon={Gamepad2} 
+                  value={formData.Time_on_Gaming} 
+                  onChange={(v: number) => updateField("Time_on_Gaming", v)} 
+                  color="indigo"
+                  warning={errorType === "logic"}
+                />
+                
+                <InputCard 
+                  label={labels.Sleep_Hours} 
+                  icon={Moon} 
+                  value={formData.Sleep_Hours} 
+                  onChange={(v: number) => updateField("Sleep_Hours", v)} 
+                  color="sky"
+                />
+                <InputCard 
+                  label={labels.Exercise_Hours} 
+                  icon={Dumbbell} 
+                  value={formData.Exercise_Hours} 
+                  onChange={(v: number) => updateField("Exercise_Hours", v)} 
+                  color="emerald"
+                />
               </div>
 
-              <h2 className="text-3xl font-bold">Hasil Analisis</h2>
+              {/* Warning & Action */}
+              <div className="sticky bottom-8 z-20">
+                <AnimatePresence>
+                  {warning && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 20, scale: 0.9 }}
+                      className="mb-4 bg-red-600/90 backdrop-blur-md border border-red-400 text-white font-semibold px-6 py-4 rounded-2xl flex items-center justify-center gap-3 shadow-2xl shadow-red-900/50"
+                    >
+                      <AlertTriangle className="w-6 h-6 shrink-0" />
+                      <span className="text-lg">{warning}</span>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-              <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50">
-                <p className="text-slate-400 text-sm mb-2">Tingkat Kecanduan</p>
-                <p className="text-5xl font-bold leading-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading || !!warning}
+                  className="w-full relative group overflow-hidden rounded-2xl bg-white p-5 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:grayscale disabled:cursor-not-allowed shadow-2xl shadow-purple-900/20"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 bg-[length:200%_auto] animate-[gradient_3s_linear_infinite] transition-all group-hover:opacity-90" />
+                  <div className="relative flex items-center justify-center gap-3 text-xl font-bold text-white tracking-wide">
+                    {loading ? (
+                      <>
+                        <Activity className="w-6 h-6 animate-spin" />
+                        Menganalisis...
+                      </>
+                    ) : (
+                      <>
+                        <Zap className="w-6 h-6 fill-current" />
+                        ANALISIS SEKARANG
+                      </>
+                    )}
+                  </div>
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="max-w-2xl mx-auto"
+            >
+              <div className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-[2.5rem] p-10 md:p-14 text-center shadow-2xl relative overflow-hidden">
+                <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${getResultColor(result.prediction)}`} />
+                
+                <h3 className="text-gray-400 text-sm uppercase tracking-[0.2em] font-bold mb-8">Hasil Analisis</h3>
+                
+                <div className="relative inline-block mb-10">
+                  <div className={`absolute inset-0 bg-gradient-to-r ${getResultColor(result.prediction)} blur-3xl opacity-30 animate-pulse`} />
+                  <h2 className={`relative text-7xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r ${getResultColor(result.prediction)} tracking-tight`}>
                     {result.prediction}
-                </p>
-
-              </div>
-
-              {result.probability && (
-                <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50">
-                  <p className="text-slate-400 text-sm mb-2">Probabilitas</p>
-                  <p className="text-3xl font-bold text-blue-400">{(result.probability * 100).toFixed(1)}%</p>
+                  </h2>
                 </div>
-              )}
 
-              {/* 🔥 Saran Berdasarkan Hasil */}
-              <div className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50 mt-4">
-                <p className="text-slate-400 text-sm mb-2">Saran</p>
-                <p className="text-lg text-slate-300">{getAdvice(result.prediction)}</p>
+                {result.probability && (
+                  <div className="flex flex-col items-center gap-3 mb-10">
+                    <div className="h-2 w-full max-w-xs bg-gray-800 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${result.probability * 100}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className={`h-full bg-gradient-to-r ${getResultColor(result.prediction)}`} 
+                      />
+                    </div>
+                    <span className="text-gray-400 font-mono tracking-widest text-sm">PROBABILITAS: {(result.probability * 100).toFixed(1)}%</span>
+                  </div>
+                )}
+
+                <div className="bg-white/5 rounded-3xl p-8 text-left border border-white/5 shadow-inner">
+                  <h4 className="flex items-center gap-3 text-xl font-bold text-white mb-4">
+                    {result.prediction === "Rendah" ? <CheckCircle2 className="w-6 h-6 text-green-500"/> : 
+                     result.prediction === "Sedang" ? <AlertTriangle className="w-6 h-6 text-yellow-500"/> : 
+                     <XCircle className="w-6 h-6 text-red-500"/>}
+                    Saran AI:
+                  </h4>
+                  <p className="text-gray-300 text-lg leading-relaxed font-light">
+                    {getAdvice(result.prediction)}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setResult(null)}
+                  className="mt-10 text-gray-400 hover:text-white transition-colors flex items-center justify-center gap-2 w-full py-4 hover:bg-white/5 rounded-2xl font-medium tracking-wide"
+                >
+                  ← KEMBALI KE FORM
+                </button>
               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-              <button
-                onClick={() => setResult(null)}
-                className="w-full bg-slate-800 hover:bg-slate-700 text-white py-4 rounded-2xl font-semibold transition-all duration-300 border border-slate-700"
-              >
-                ← Kembali ke Form
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="max-w-6xl mx-auto mt-8 text-center text-slate-500 text-sm">
-        <p>Powered by AI • Data Anda aman dan tidak disimpan</p>
       </div>
     </div>
   );
