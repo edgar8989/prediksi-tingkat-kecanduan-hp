@@ -7,7 +7,7 @@ import {
   Gamepad2, TrendingUp, Activity, CheckCircle2, AlertTriangle, XCircle 
 } from "lucide-react";
 
-// --- Types ---
+// --- Types --
 type FormDataKey =
   | "Age"
   | "Daily_Usage_Hours"
@@ -133,7 +133,7 @@ export default function PhoneAddictionPredictor() {
     await new Promise(r => setTimeout(r, 1500));
 
     try {
-      const res = await fetch("https://web-production-57cb3.up.railway.app/predict", {
+      const res = await fetch("https://web-production-62f9f.up.railway.app/predict", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
